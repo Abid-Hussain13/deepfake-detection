@@ -1,0 +1,131 @@
+================================================================================
+          MULTIMEDIA FORENSICS AND DEEPFAKE DETECTION ANALYSIS PLATFORM
+                    PROJECT ARCHITECTURE AND TECHNICAL EVALUATION
+================================================================================
+
+1. SYSTEM OVERVIEW & DESIGN OBJECTIVES
+The Deepfake Inspector is a high-fidelity multimedia forensic evaluation system 
+engineered to detect digital manipulations, facial-swaps, and generative 
+adversarial network (GAN) artifacts. The primary objective is to provide a 
+rigorous diagnostic environment that isolates structural, optical, and sensor-
+level indicators of forgery in both static images and video streams.
+
+The system is designed with a dual-state execution model:
+- Active Mode: Leverages multimodal AI reasoning (Gemini 3.5-Flash) for 
+  context-aware visual analysis.
+- Fallback Mode: Employs deterministic, seed-based heuristic algorithms to 
+  ensure system stability and test-harness reliability in restricted 
+  environments.
+
+
+2. SYSTEM ARCHITECTURE & DATA FLOW PROTOCOL
+The application employs a decoupled client-server topology using modern 
+web standards:
+
+  +-----------------------+              +-----------------------+
+  |  CLIENT-SIDE REACT    |              |  EXPRESS BACK-END     |
+  |  - Drag-and-drop file |              |  - Route Handler      |
+  |  - Canvas Rasterizing|  JSON POST   |  - API Key Resolver   |
+  |  - Vector SVG Overlays|------------->|  - JSON-Schema Engine |
+  |  - History/Storage    |  (Base64)    |                       |
+  +-----------------------+              +-----------------------+
+              ^                                      |
+              |                                      v
+              |                          +-----------------------+
+              |                          |   EVALUATION ENGINE   |
+              |     Structured Analysis  |   - Multi-frame LLM   |
+              +--------------------------|     OR                |
+                    (JSON Payload)       |   - Seed Hash Fallback|
+                                         +-----------------------+
+
+Data Flow Sequence:
+1. Ingestion: Media is processed via the `UploadZone` component.
+2. Raster Frame Extraction: For video streams, the system utilizes an off-screen 
+   HTML5 Canvas to extract 4 keyframes at uniform temporal intervals (10% to 90% 
+   strides), converting transient video data into a discrete frame array for 
+   multi-point inspection.
+3. Transmission: Payloads are serialized into Base64 strings and transmitted via 
+   HTTP POST with a strict JSON interface.
+4. Analytical Routing: The server evaluates the payload using either the 
+   primary multimodal vision engine or a deterministic fallback algorithm.
+5. Rendering: The client projects responsive SVG bounding boxes and Recharts-
+   based probability curves representing manipulation indices.
+
+
+3. COMPUTER VISION & VISUAL SIGNAL PROCESSING
+The platform utilizes a combination of advanced Computer Vision (CV) techniques 
+and Large Language Model (LLM) visual reasoning to detect anomalies:
+
+A. Multimodal Visual Reasoning (Gemini 3.5-Flash)
+The system treats the AI model as a high-level visual cortex. It performs 
+unstructured feature extraction, identifying semantic inconsistencies like 
+asymmetric iris reflections or unnatural epidermal subsurface scattering 
+that traditional pixel-level filters might miss.
+
+B. Biometric Landmark Mapping
+The system identifies facial landmarks to evaluate spatial proportions. It 
+checks the alignment of the pupillary line, nasal bridge symmetry, and the 
+distance ratios between the oral commissure and the jawline. Structural 
+deviations here often signal "warping" artifacts from GAN generators.
+
+C. Optical Analysis (Lighting & Specular Vectors)
+CV logic is applied to verify lighting consistency. Authentic photography 
+maintains uniform specular highlights across the facial surface. The system 
+detects "optical conflicts"—shadow skews that don't match the primary 
+detected light source, a common failure in composite deepfakes.
+
+D. Signal Analysis (Quantization & Noise)
+Deepfake generators often disrupt standard camera sensor patterns (PRNU). 
+The analysis engine inspects for localized high-frequency blocks and non-
+uniform compression artifacts (quantization matrices) that appear adjacent 
+to over-smoothed facial regions.
+
+E. Temporal Continuity Evaluation
+For video sequences, cross-frame consistency is analyzed. The system 
+identifies "frame jitter"—flickering features or boundary shearing that 
+occurs when a digital mask fails to track perfectly with the subject's 
+head rotation.
+
+
+4. CORE TECHNICAL COMPONENTS
+- ForensicViewer.tsx: Implements a custom viewport using SVG layers aligned 
+  to media coordinates. It renders detected facial contours and anomaly zones 
+  dynamically. It includes a "FaceMeshFallback" procedural mesh to maintain 
+  HUD alignment during data-less states.
+- AnalysisPanel.tsx: Segregates scalar metrics into structured diagnostic 
+  parameters. It maps scores for facial geometry, lighting, and signal 
+  continuity using custom-rendered SVG dials.
+- TimelineChart.tsx: Utilizes the Recharts library to map manipulation 
+  probabilities over the video runtime, helping analysts isolate specific 
+  frames of interest.
+- UploadZone.tsx: Orchestrates the asynchronous frame-capture loop, 
+  managing the memory heap during canvas-based rasterization of 
+  high-resolution video assets.
+
+
+5. SERVER-SIDE EXECUTION ENGINES
+
+A. AI Extraction (Active Mode)
+The server transmits structural prompt parameters containing explicit 
+coordinate request guidelines. A strict JSON Response Schema is enforced, 
+requiring the model to return:
+  - Global prediction verdict ("REAL" / "FAKE")
+  - Confidence percentile limits
+  - Detailed diagnostic arrays (Symmetry, Lighting, Signal)
+  - Bounding coordinates [x, y, width, height] as percentages of the viewport
+
+B. Deterministic Simulation (Fallback Mode)
+When API resources are unavailable, the engine falls back to a reproducible 
+seed-based simulation:
+  - String Hashing: Processes the filename's ASCII sum to create a stable seed.
+  - Modulo Logic: Determines the "prediction" through deterministic math 
+    (Seed % 100), ensuring identical results for the same file across sessions.
+  - Latency Emulation: A 2500ms timeout is introduced to maintain user 
+    experience consistency with real-world neural inference delays.
+
+
+6. CONCLUSION
+The Deepfake Inspector represents a professional-grade integration of modern 
+web technologies and Computer Vision principles. By combining the heuristic 
+reliability of traditional forensics with the cognitive depth of multimodal AI, 
+the platform provides a robust framework for digital media verification.
