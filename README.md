@@ -58,7 +58,9 @@ npm run start
 ## License
 
 This project is licensed under the MIT License.
-        project contributors
+
+## project contributors
+
         MUHAMMAD ABID (2149)
         ABDUL SAMAD (2208)
         MUHAMMAD ABDULLAH (2134)
